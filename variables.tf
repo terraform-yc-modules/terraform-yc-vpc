@@ -4,6 +4,12 @@ variable "create_vpc" {
   description = "Shows whether a VCP object should be created. If false, an existing `vpc_id` is required."
 }
 
+variable "create_sg" {
+  type        = bool
+  default     = true
+  description = "Shows whether а security group for VCP object should be created"
+}
+
 variable "vpc_id" {
   type        = string
   default     = null

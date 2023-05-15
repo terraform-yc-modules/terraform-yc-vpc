@@ -52,7 +52,7 @@ resource "yandex_vpc_subnet" "private" {
 }
 
 ## Routes
-resource "yandex_vpc_gateway" "egress-gateway" {
+resource "yandex_vpc_gateway" "egress_gateway" {
   count = var.create_nat_gw ? 1 : 0
   name  = "${var.network_name}-egress-gateway"
   shared_egress_gateway {}
@@ -86,7 +86,7 @@ resource "yandex_vpc_route_table" "private" {
     for_each = var.create_nat_gw == false ? [] : var.private_subnets
     content {
       destination_prefix = "0.0.0.0/0"
-      gateway_id         = yandex_vpc_gateway.egress-gateway[0].id
+      gateway_id         = yandex_vpc_gateway.egress_gateway[0].id
     }
   }
 

@@ -34,7 +34,7 @@ variable "folder_id" {
 }
 
 variable "public_subnets" {
-  description = "Describe your public subnet preferences"
+  description = "Describe your public subnet preferences. For VMs with public IPs"
   type = list(object({
     zone           = string
     v4_cidr_blocks = list(string)
@@ -43,7 +43,7 @@ variable "public_subnets" {
 }
 
 variable "private_subnets" {
-  description = "Describe your private subnet preferences"
+  description = "Describe your private subnet preferences. For VMs without public IPs but with or without NAT gateway"
   type = list(object({
     zone           = string
     v4_cidr_blocks = list(string)

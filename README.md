@@ -30,7 +30,7 @@ export YC_FOLDER_ID=$(yc config get folder-id)
 
 | Name | Version |
 |------|---------|
-| <a name="provider_yandex"></a> [yandex](#provider\_yandex) | 0.89.0 |
+| <a name="provider_yandex"></a> [yandex](#provider\_yandex) | 0.90.0 |
 
 ## Modules
 
@@ -41,7 +41,7 @@ No modules.
 | Name | Type |
 |------|------|
 | [yandex_vpc_default_security_group.default_sg](https://registry.terraform.io/providers/yandex-cloud/yandex/latest/docs/resources/vpc_default_security_group) | resource |
-| [yandex_vpc_gateway.egress-gateway](https://registry.terraform.io/providers/yandex-cloud/yandex/latest/docs/resources/vpc_gateway) | resource |
+| [yandex_vpc_gateway.egress_gateway](https://registry.terraform.io/providers/yandex-cloud/yandex/latest/docs/resources/vpc_gateway) | resource |
 | [yandex_vpc_network.this](https://registry.terraform.io/providers/yandex-cloud/yandex/latest/docs/resources/vpc_network) | resource |
 | [yandex_vpc_route_table.private](https://registry.terraform.io/providers/yandex-cloud/yandex/latest/docs/resources/vpc_route_table) | resource |
 | [yandex_vpc_route_table.public](https://registry.terraform.io/providers/yandex-cloud/yandex/latest/docs/resources/vpc_route_table) | resource |
@@ -54,8 +54,8 @@ No modules.
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
 | <a name="input_create_nat_gw"></a> [create\_nat\_gw](#input\_create\_nat\_gw) | Create a NAT gateway for internet access from private subnets | `bool` | `true` | no |
+| <a name="input_create_sg"></a> [create\_sg](#input\_create\_sg) | Shows whether а security group for VCP object should be created | `bool` | `true` | no |
 | <a name="input_create_vpc"></a> [create\_vpc](#input\_create\_vpc) | Shows whether a VCP object should be created. If false, an existing `vpc_id` is required. | `bool` | `true` | no |
-| <a name="input_create_sg"></a> [create\_sg](#input\_create\_sg) | Shows whether a SG for VCP object should be created | `bool` | `true` | no |
 | <a name="input_domain_name"></a> [domain\_name](#input\_domain\_name) | Domain name to be added to DHCP options | `string` | `null` | no |
 | <a name="input_domain_name_servers"></a> [domain\_name\_servers](#input\_domain\_name\_servers) | Domain name servers to be added to DHCP options | `list(string)` | `[]` | no |
 | <a name="input_folder_id"></a> [folder\_id](#input\_folder\_id) | Folder ID where the resources will be created | `string` | `null` | no |
@@ -63,8 +63,8 @@ No modules.
 | <a name="input_network_description"></a> [network\_description](#input\_network\_description) | Optional description of this resource. Provide this property when you create the resource. | `string` | `"terraform-created"` | no |
 | <a name="input_network_name"></a> [network\_name](#input\_network\_name) | Prefix to be used with all the resources as an identifier | `string` | n/a | yes |
 | <a name="input_ntp_servers"></a> [ntp\_servers](#input\_ntp\_servers) | NTP Servers for subnets | `list(string)` | `[]` | no |
-| <a name="input_private_subnets"></a> [private\_subnets](#input\_private\_subnets) | Describe your private subnet preferences | <pre>list(object({<br>    zone           = string<br>    v4_cidr_blocks = list(string)<br>  }))</pre> | `null` | no |
-| <a name="input_public_subnets"></a> [public\_subnets](#input\_public\_subnets) | Describe your public subnet preferences | <pre>list(object({<br>    zone           = string<br>    v4_cidr_blocks = list(string)<br>  }))</pre> | `null` | no |
+| <a name="input_private_subnets"></a> [private\_subnets](#input\_private\_subnets) | Describe your private subnet preferences. For VMs without public IPs but with or without NAT gateway | <pre>list(object({<br>    zone           = string<br>    v4_cidr_blocks = list(string)<br>  }))</pre> | `null` | no |
+| <a name="input_public_subnets"></a> [public\_subnets](#input\_public\_subnets) | Describe your public subnet preferences. For VMs with public IPs | <pre>list(object({<br>    zone           = string<br>    v4_cidr_blocks = list(string)<br>  }))</pre> | `null` | no |
 | <a name="input_routes_private_subnets"></a> [routes\_private\_subnets](#input\_routes\_private\_subnets) | Describe your route preferences for public subnets | <pre>list(object({<br>    destination_prefix = string<br>    next_hop_address   = string<br>  }))</pre> | `null` | no |
 | <a name="input_routes_public_subnets"></a> [routes\_public\_subnets](#input\_routes\_public\_subnets) | Describe your route preferences for public subnets | <pre>list(object({<br>    destination_prefix = string<br>    next_hop_address   = string<br>  }))</pre> | `null` | no |
 | <a name="input_vpc_id"></a> [vpc\_id](#input\_vpc\_id) | Existing `network_id` (`vpc-id`) where resources will be created | `string` | `null` | no |

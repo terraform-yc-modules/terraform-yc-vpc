@@ -32,12 +32,12 @@ module "net" {
       "zone" : "ru-central1-c"
     },
   ]
-  routes_public_subnets = [
-    {
-      destination_prefix : "172.16.0.0/16",
-      next_hop_address : "10.131.0.10"
-    },
-  ]
+  # routes_public_subnets = [
+  #   {
+  #     destination_prefix : "172.16.0.0/16",
+  #     next_hop_address : "10.131.0.10"
+  #   },
+  # ]
   routes_private_subnets = [
     {
       destination_prefix : "172.16.0.0/16",

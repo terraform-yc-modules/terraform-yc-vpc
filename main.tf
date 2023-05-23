@@ -17,7 +17,7 @@ resource "yandex_vpc_network" "this" {
 }
 
 resource "yandex_vpc_subnet" "public" {
-  for_each       = var.public_subnets == null ? {} : { for v in var.public_subnets : v.v4_cidr_blocks[0] => v }
+  for_each       = try({ for v in var.public_subnets : v.v4_cidr_blocks[0] => v }, {})
   name           = "public-${var.network_name}-${each.value.zone}:${each.value.v4_cidr_blocks[0]}"
   description    = "${var.network_name} subnet for zone ${each.value.zone}"
   v4_cidr_blocks = each.value.v4_cidr_blocks
@@ -35,7 +35,7 @@ resource "yandex_vpc_subnet" "public" {
 }
 
 resource "yandex_vpc_subnet" "private" {
-  for_each       = var.private_subnets == null ? {} : { for v in var.private_subnets : v.v4_cidr_blocks[0] => v }
+  for_each       = try({ for v in var.private_subnets : v.v4_cidr_blocks[0] => v }, {})
   name           = "private-${var.network_name}-${each.value.zone}:${each.value.v4_cidr_blocks[0]}"
   description    = "${var.network_name} subnet for zone ${each.value.zone}"
   v4_cidr_blocks = each.value.v4_cidr_blocks
@@ -86,7 +86,7 @@ resource "yandex_vpc_route_table" "private" {
     }
   }
   dynamic "static_route" {
-    for_each = var.create_nat_gw ? var.private_subnets : []
+    for_each = var.create_nat_gw ? yandex_vpc_gateway.egress_gateway : []
     content {
       destination_prefix = "0.0.0.0/0"
       gateway_id         = yandex_vpc_gateway.egress_gateway[0].id
@@ -131,11 +131,9 @@ resource "yandex_vpc_default_security_group" "default_sg" {
   }
 
   ingress {
-    protocol       = "TCP"
-    description    = "NLB health check"
-    v4_cidr_blocks = ["198.18.235.0/24", "198.18.248.0/24"]
-    from_port      = 0
-    to_port        = 65535
+    protocol          = "TCP"
+    description       = "NLB health check"
+    predefined_target = "loadbalancer_healthchecks"
   }
 
   egress {

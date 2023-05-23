@@ -3,6 +3,7 @@
 ## Features
 
 - Create Network and subnets in your folder
+- Supports MultiFolder VPC concept by adding folder_id to subnet object
 - Subnets can be both public for VMs with public IPs and private, with or without NAT gateway
 - Configure your default security group
 - Easy to use in other resources via outputs

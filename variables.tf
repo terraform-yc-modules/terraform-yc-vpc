@@ -34,21 +34,42 @@ variable "folder_id" {
 }
 
 variable "public_subnets" {
-  description = "Describe your public subnet preferences. For VMs with public IPs"
-  type = list(object({
-    zone           = string
-    v4_cidr_blocks = list(string)
-  }))
-  default = null
+  description = <<EOF
+  "Describe your public subnet preferences. For VMs with public IPs. For Multi-Folder VPC add folder_ids to subnet objects"
+  Example:
+  public_subnets = [
+  {
+    "v4_cidr_blocks" : ["10.121.0.0/16", "10.122.0.0/16"],
+    "zone" : "ru-central1-a"
+  },
+  {
+    "v4_cidr_blocks" : ["10.131.0.0/16"],
+    "zone" : "ru-central1-b"
+    "folder_id" : "xxxxxxx" # For Multi-Folder VPC
+  },
+  ]
+  EOF
+  type        = any
+  default     = null
 }
 
 variable "private_subnets" {
-  description = "Describe your private subnet preferences. For VMs without public IPs but with or without NAT gateway"
-  type = list(object({
-    zone           = string
-    v4_cidr_blocks = list(string)
-  }))
-  default = null
+  description = <<EOF
+  "Describe your private subnet preferences. For VMs without public IPs but with or without NAT gateway. For Multi-Folder VPC add folder_id to subnet object"
+  private_subnets = [
+  {
+    "v4_cidr_blocks" : ["10.221.0.0/16"],
+    "zone" : "ru-central1-a"
+  },
+  {
+    "v4_cidr_blocks" : ["10.231.0.0/16"],
+    "zone" : "ru-central1-b"
+    "folder_id" : "xxxxxxx" # For Multi-Folder VPC
+  },
+  ]
+  EOF
+  type        = any
+  default     = null
 }
 
 variable "create_nat_gw" {
@@ -92,5 +113,7 @@ variable "ntp_servers" {
 variable "labels" {
   description = "Set of key/value label pairs to assign."
   type        = map(string)
-  default     = null
+  default = {
+    created_by = "terraform yc module"
+  }
 }

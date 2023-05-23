@@ -23,8 +23,8 @@ resource "yandex_vpc_subnet" "public" {
   v4_cidr_blocks = each.value.v4_cidr_blocks
   zone           = each.value.zone
   network_id     = local.vpc_id
-  folder_id      = local.folder_id
-  route_table_id = yandex_vpc_route_table.public.id
+  folder_id      = lookup(each.value, "folder_id", local.folder_id)
+  route_table_id = try(yandex_vpc_route_table.public[0].id, null)
   dhcp_options {
     domain_name         = var.domain_name == null ? "internal." : var.domain_name
     domain_name_servers = var.domain_name_servers == null ? [cidrhost(each.value.v4_cidr_blocks[0], 2)] : var.domain_name_servers
@@ -33,6 +33,7 @@ resource "yandex_vpc_subnet" "public" {
 
   labels = var.labels
 }
+
 resource "yandex_vpc_subnet" "private" {
   for_each       = var.private_subnets == null ? {} : { for v in var.private_subnets : v.v4_cidr_blocks[0] => v }
   name           = "private-${var.network_name}-${each.value.zone}:${each.value.v4_cidr_blocks[0]}"
@@ -40,8 +41,8 @@ resource "yandex_vpc_subnet" "private" {
   v4_cidr_blocks = each.value.v4_cidr_blocks
   zone           = each.value.zone
   network_id     = local.vpc_id
-  folder_id      = local.folder_id
-  route_table_id = yandex_vpc_route_table.private.id
+  folder_id      = lookup(each.value, "folder_id", local.folder_id)
+  route_table_id = try(yandex_vpc_route_table.private[0].id, null)
   dhcp_options {
     domain_name         = var.domain_name == null ? "internal." : var.domain_name
     domain_name_servers = var.domain_name_servers == null ? [cidrhost(each.value.v4_cidr_blocks[0], 2)] : var.domain_name_servers
@@ -53,12 +54,13 @@ resource "yandex_vpc_subnet" "private" {
 
 ## Routes
 resource "yandex_vpc_gateway" "egress_gateway" {
-  count = var.create_nat_gw ? 1 : 0
+  count = var.create_nat_gw && var.private_subnets != null ? 1 : 0
   name  = "${var.network_name}-egress-gateway"
   shared_egress_gateway {}
 }
 
 resource "yandex_vpc_route_table" "public" {
+  count      = var.public_subnets == null ? 0 : 1
   name       = "${var.network_name}-public"
   network_id = local.vpc_id
 
@@ -72,6 +74,7 @@ resource "yandex_vpc_route_table" "public" {
 
 }
 resource "yandex_vpc_route_table" "private" {
+  count      = var.private_subnets == null ? 0 : 1
   name       = "${var.network_name}-private"
   network_id = local.vpc_id
 
@@ -83,7 +86,7 @@ resource "yandex_vpc_route_table" "private" {
     }
   }
   dynamic "static_route" {
-    for_each = var.create_nat_gw == false ? [] : var.private_subnets
+    for_each = var.create_nat_gw ? var.private_subnets : []
     content {
       destination_prefix = "0.0.0.0/0"
       gateway_id         = yandex_vpc_gateway.egress_gateway[0].id

@@ -15,6 +15,7 @@ output "public_subnets" {
     "name"           = v.name,
     "zone"           = v.zone
     "v4_cidr_blocks" = v.v4_cidr_blocks
+    "folder_id"      = v.folder_id
     }
   }
 }
@@ -30,6 +31,7 @@ output "private_subnets" {
     "name"           = v.name,
     "zone"           = v.zone
     "v4_cidr_blocks" = v.v4_cidr_blocks
+    "folder_id"      = v.folder_id
     }
   }
 }

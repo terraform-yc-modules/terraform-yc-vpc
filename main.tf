@@ -63,6 +63,7 @@ resource "yandex_vpc_route_table" "public" {
   count      = var.public_subnets == null ? 0 : 1
   name       = "${var.network_name}-public"
   network_id = local.vpc_id
+  folder_id  = lookup(each.value, "folder_id", local.folder_id)
 
   dynamic "static_route" {
     for_each = var.routes_public_subnets == null ? [] : var.routes_public_subnets
@@ -77,6 +78,7 @@ resource "yandex_vpc_route_table" "private" {
   count      = var.private_subnets == null ? 0 : 1
   name       = "${var.network_name}-private"
   network_id = local.vpc_id
+  folder_id  = lookup(each.value, "folder_id", local.folder_id)
 
   dynamic "static_route" {
     for_each = var.routes_private_subnets == null ? [] : var.routes_private_subnets
@@ -100,6 +102,7 @@ resource "yandex_vpc_default_security_group" "default_sg" {
   count       = var.create_vpc && var.create_sg ? 1 : 0
   description = "Default security group"
   network_id  = local.vpc_id
+  folder_id   = lookup(each.value, "folder_id", local.folder_id)
   labels      = var.labels
 
   ingress {

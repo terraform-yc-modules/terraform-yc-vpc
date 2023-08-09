@@ -96,8 +96,9 @@ resource "yandex_vpc_route_table" "private" {
 }
 
 ## Default Security Group
-resource "yandex_vpc_default_security_group" "default_sg" {
+resource "yandex_vpc_security_group" "default_sg" {
   count       = var.create_vpc && var.create_sg ? 1 : 0
+  name = "default"
   description = "Default security group"
   network_id  = local.vpc_id
   labels      = var.labels

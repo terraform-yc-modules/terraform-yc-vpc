@@ -26,9 +26,9 @@ resource "yandex_vpc_subnet" "public" {
   folder_id      = lookup(each.value, "folder_id", local.folder_id)
   route_table_id = try(yandex_vpc_route_table.public[0].id, null)
   dhcp_options {
-    domain_name         = var.domain_name == null ? "internal." : var.domain_name
-    domain_name_servers = var.domain_name_servers == null ? [cidrhost(each.value.v4_cidr_blocks[0], 2)] : var.domain_name_servers
-    ntp_servers         = var.ntp_servers == null ? ["ntp0.NL.net", "clock.isc.org", "ntp.ix.ru"] : var.ntp_servers
+    domain_name         = var.domain_name
+    domain_name_servers = var.domain_name_servers
+    ntp_servers         = var.ntp_servers
   }
 
   labels = var.labels
@@ -44,9 +44,9 @@ resource "yandex_vpc_subnet" "private" {
   folder_id      = lookup(each.value, "folder_id", local.folder_id)
   route_table_id = try(yandex_vpc_route_table.private[0].id, null)
   dhcp_options {
-    domain_name         = var.domain_name == null ? "internal." : var.domain_name
-    domain_name_servers = var.domain_name_servers == null ? [cidrhost(each.value.v4_cidr_blocks[0], 2)] : var.domain_name_servers
-    ntp_servers         = var.ntp_servers == null ? ["ntp0.NL.net", "clock.isc.org", "ntp.ix.ru"] : var.ntp_servers
+    domain_name         = var.domain_name
+    domain_name_servers = var.domain_name_servers
+    ntp_servers         = var.ntp_servers
   }
 
   labels = var.labels

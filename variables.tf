@@ -96,19 +96,19 @@ variable "routes_private_subnets" {
 }
 variable "domain_name" {
   type        = string
-  default     = null
+  default     = ""
   description = "Domain name to be added to DHCP options"
 }
 
 variable "domain_name_servers" {
   type        = list(string)
   default     = []
-  description = "Domain name servers to be added to DHCP options"
+  description = "Domain name servers to be added to DHCP options. Only ip addresses can be used"
 }
 variable "ntp_servers" {
   type        = list(string)
   default     = []
-  description = "NTP Servers for subnets"
+  description = "NTP Servers for subnets. Only ip addresses can be used"
 }
 variable "labels" {
   description = "Set of key/value label pairs to assign."

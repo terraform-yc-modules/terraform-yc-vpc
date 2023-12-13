@@ -96,7 +96,7 @@ variable "routes_private_subnets" {
 }
 variable "domain_name" {
   type        = string
-  default     = ""
+  default     = "internal."
   description = "Domain name to be added to DHCP options"
 }
 

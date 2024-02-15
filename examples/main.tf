@@ -15,7 +15,7 @@ module "net" {
     },
     {
       "v4_cidr_blocks" : ["10.141.0.0/16"],
-      "zone" : "ru-central1-c"
+      "zone" : "ru-central1-d"
     },
   ]
   private_subnets = [
@@ -29,7 +29,7 @@ module "net" {
     },
     {
       "v4_cidr_blocks" : ["10.241.0.0/16"],
-      "zone" : "ru-central1-c"
+      "zone" : "ru-central1-d"
     },
   ]
   # routes_public_subnets = [

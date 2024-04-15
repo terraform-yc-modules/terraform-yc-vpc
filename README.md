@@ -31,7 +31,7 @@ export YC_FOLDER_ID=$(yc config get folder-id)
 
 | Name | Version |
 |------|---------|
-| <a name="provider_yandex"></a> [yandex](#provider\_yandex) | 0.104.0 |
+| <a name="provider_yandex"></a> [yandex](#provider\_yandex) | 0.115.0 |
 
 ## Modules
 

@@ -24,7 +24,7 @@ resource "yandex_vpc_subnet" "public" {
   zone           = each.value.zone
   network_id     = local.vpc_id
   folder_id      = lookup(each.value, "folder_id", local.folder_id)
-  route_table_id = try(yandex_vpc_route_table.public[0].id, null)
+  route_table_id = yandex_vpc_route_table.public[0].id
   dhcp_options {
     domain_name         = var.domain_name
     domain_name_servers = var.domain_name_servers
@@ -42,7 +42,7 @@ resource "yandex_vpc_subnet" "private" {
   zone           = each.value.zone
   network_id     = local.vpc_id
   folder_id      = lookup(each.value, "folder_id", local.folder_id)
-  route_table_id = try(yandex_vpc_route_table.private[0].id, null)
+  route_table_id = yandex_vpc_route_table.private[0].id
   dhcp_options {
     domain_name         = var.domain_name
     domain_name_servers = var.domain_name_servers

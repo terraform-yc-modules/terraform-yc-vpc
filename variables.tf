@@ -41,6 +41,8 @@ variable "public_subnets" {
   {
     "v4_cidr_blocks" : ["10.121.0.0/16", "10.122.0.0/16"],
     "zone" : "ru-central1-a"
+    "description" : "Custom public-subnet description"
+    "name" : "Custom public-subnet name"
   },
   {
     "v4_cidr_blocks" : ["10.131.0.0/16"],
@@ -49,8 +51,14 @@ variable "public_subnets" {
   },
   ]
   EOF
-  type        = any
-  default     = null
+  type = list(object({
+    v4_cidr_blocks = list(string)
+    zone           = string
+    description    = optional(string)
+    name           = optional(string)
+    folder_id      = optional(string)
+  }))
+  default = null
 }
 
 variable "private_subnets" {
@@ -60,6 +68,8 @@ variable "private_subnets" {
   {
     "v4_cidr_blocks" : ["10.221.0.0/16"],
     "zone" : "ru-central1-a"
+    "description" : "Custom private-subnet description"
+    "name" : "Custom private-subnet name"
   },
   {
     "v4_cidr_blocks" : ["10.231.0.0/16"],
@@ -68,8 +78,14 @@ variable "private_subnets" {
   },
   ]
   EOF
-  type        = any
-  default     = null
+  type = list(object({
+    v4_cidr_blocks = list(string)
+    zone           = string
+    description    = optional(string)
+    name           = optional(string)
+    folder_id      = optional(string)
+  }))
+  default = null
 }
 
 variable "create_nat_gw" {

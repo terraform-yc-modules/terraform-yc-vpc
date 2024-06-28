@@ -18,7 +18,7 @@ resource "yandex_vpc_network" "this" {
 
 resource "yandex_vpc_subnet" "public" {
   for_each       = try({ for v in var.public_subnets : v.v4_cidr_blocks[0] => v }, {})
-  name           = lookup(each.value, "name", "public-${var.network_name}-${each.value.zone}:${each.value.v4_cidr_blocks[0]}")
+  name           = lookup(each.value, "name", "public-${var.network_name}-${each.value.zone}-${each.value.v4_cidr_blocks[0]}")
   description    = lookup(each.value, "description", "${var.network_name} subnet for zone ${each.value.zone}")
   v4_cidr_blocks = each.value.v4_cidr_blocks
   zone           = each.value.zone
@@ -36,7 +36,7 @@ resource "yandex_vpc_subnet" "public" {
 
 resource "yandex_vpc_subnet" "private" {
   for_each       = try({ for v in var.private_subnets : v.v4_cidr_blocks[0] => v }, {})
-  name           = lookup(each.value, "name", "private-${var.network_name}-${each.value.zone}:${each.value.v4_cidr_blocks[0]}")
+  name           = lookup(each.value, "name", "private-${var.network_name}-${each.value.zone}-${each.value.v4_cidr_blocks[0]}")
   description    = lookup(each.value, "description", "${var.network_name} subnet for zone ${each.value.zone}")
   v4_cidr_blocks = each.value.v4_cidr_blocks
   zone           = each.value.zone

@@ -130,6 +130,6 @@ variable "labels" {
   description = "Set of key/value label pairs to assign."
   type        = map(string)
   default = {
-    created_by = "terraform yc module"
+    created_by = "terraform-yc-module"
   }
 }

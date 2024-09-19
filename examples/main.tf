@@ -4,6 +4,9 @@ module "net" {
   network_description = "terraform-created"
   network_name        = "net-module-example"
   create_vpc          = true
+  create_s3_pe = {
+    enable = true
+  }
   public_subnets = [
     {
       "v4_cidr_blocks" : ["10.121.0.0/16"],

@@ -133,3 +133,14 @@ variable "labels" {
     created_by = "terraform-yc-module"
   }
 }
+variable "create_s3_pe" {
+  type = object({
+    enable                      = optional(bool, false)
+    private_dns_records_enabled = optional(bool, true)
+    subnet_v4_cidr_block        = optional(string, null)
+    address                     = optional(string, null)
+    }
+  )
+  default     = {}
+  description = "Create private endpoint for Object Storage. Subnet v4_cidr_block and ip address from it can be set"
+}

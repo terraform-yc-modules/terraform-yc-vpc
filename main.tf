@@ -98,6 +98,28 @@ resource "yandex_vpc_route_table" "private" {
 
 }
 
+##Private connections
+resource "yandex_vpc_private_endpoint" "object_storage" {
+  count       = var.create_s3_pe.enable == true ? 1 : 0
+  name        = "${var.network_name}-s3-PE"
+  description = "Object storage private endpoint in ${var.network_name}"
+
+  labels = var.labels
+
+  network_id = local.vpc_id
+
+  object_storage {}
+
+  dns_options {
+    private_dns_records_enabled = var.create_s3_pe.private_dns_records_enabled
+  }
+
+  endpoint_address {
+    subnet_id = var.create_s3_pe.subnet_v4_cidr_block == null ? yandex_vpc_subnet.private[var.private_subnets[0].v4_cidr_blocks[0]].id : yandex_vpc_subnet.private[var.create_s3_pe.subnet_v4_cidr_block].id
+    address   = var.create_s3_pe.address
+  }
+}
+
 ## Default Security Group
 resource "yandex_vpc_default_security_group" "default_sg" {
   count       = var.create_vpc && var.create_sg ? 1 : 0

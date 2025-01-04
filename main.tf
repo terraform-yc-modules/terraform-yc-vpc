@@ -39,7 +39,7 @@ resource "yandex_vpc_subnet" "network-subnets" {
     ]
   ]) : "${subnet.network_name}.${subnet.subnet_name}" => subnet })
 
-  name           = "${local.prefix_name}-${each.value.subnet_name}"
+  name           = "${local.prefix_name}-${each.value.subnet_name}-${substr(each.value.zone, -1, 0)}"
   network_id     = each.value.network_id
   zone           = each.value.zone
   v4_cidr_blocks = each.value.v4_cidr_blocks

@@ -1,37 +1,18 @@
-output "vpc_id" {
-  description = "ID of the created network for internal communications"
-  value       = var.create_vpc ? yandex_vpc_network.this[0].id : null
-}
-
-output "public_v4_cidr_blocks" {
-  description = "List of `v4_cidr_blocks` used in the VPC network"
-  value       = flatten([for subnet in yandex_vpc_subnet.public : subnet.v4_cidr_blocks])
-}
-
-output "public_subnets" {
-  description = "Map of public subnets: `key = first v4_cidr_block`"
-  value = { for v in yandex_vpc_subnet.public : v.v4_cidr_blocks[0] => {
-    "subnet_id"      = v.id,
-    "name"           = v.name,
-    "zone"           = v.zone
-    "v4_cidr_blocks" = v.v4_cidr_blocks
-    "folder_id"      = v.folder_id
-    }
-  }
-}
-output "private_v4_cidr_blocks" {
-  description = "List of `v4_cidr_blocks` used in the VPC network"
-  value       = flatten([for subnet in yandex_vpc_subnet.private : subnet.v4_cidr_blocks])
-}
-
-output "private_subnets" {
-  description = "Map of private subnets: `key = first v4_cidr_block`"
-  value = { for v in yandex_vpc_subnet.private : v.v4_cidr_blocks[0] => {
-    "subnet_id"      = v.id,
-    "name"           = v.name,
-    "zone"           = v.zone
-    "v4_cidr_blocks" = v.v4_cidr_blocks
-    "folder_id"      = v.folder_id
-    }
-  }
+output "networks_with_subnets" {
+  description = "Networks with subnets"
+  value = [
+    for net_key, net in var.networks : {
+        network_id = net.user_network == false ? yandex_vpc_network.network[net_key].id : net_key
+        network_name = net.user_network == false ? yandex_vpc_network.network[net_key].name : null
+        subnets = [
+          for sub_key, sub in net.subnets : {
+            subnet_id = yandex_vpc_subnet.network-subnets["${net_key}.${sub_key}"].id
+            subnet_name = yandex_vpc_subnet.network-subnets["${net_key}.${sub_key}"].name
+            v4_cidr_blocks = yandex_vpc_subnet.network-subnets["${net_key}.${sub_key}"].v4_cidr_blocks
+            zone = yandex_vpc_subnet.network-subnets["${net_key}.${sub_key}"].zone
+            public = sub.public
+          }
+        ]
+      }
+  ]
 }

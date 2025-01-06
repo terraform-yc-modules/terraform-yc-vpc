@@ -1,135 +1,165 @@
-variable "create_vpc" {
-  type        = bool
-  default     = true
-  description = "Shows whether a VCP object should be created. If false, an existing `vpc_id` is required."
-}
-
-variable "create_sg" {
-  type        = bool
-  default     = true
-  description = "Shows whether а security group for VCP object should be created"
-}
-
-variable "vpc_id" {
-  type        = string
-  default     = null
-  description = "Existing `network_id` (`vpc-id`) where resources will be created"
-}
-
-variable "network_name" {
-  description = "Prefix to be used with all the resources as an identifier"
-  type        = string
-}
-
-variable "network_description" {
-  description = "Optional description of this resource. Provide this property when you create the resource."
-  type        = string
-  default     = "terraform-created"
-}
-
 variable "folder_id" {
-  type        = string
-  default     = null
-  description = "Folder ID where the resources will be created"
-}
-
-variable "public_subnets" {
   description = <<EOF
-  "Describe your public subnet preferences. For VMs with public IPs. For Multi-Folder VPC add folder_ids to subnet objects"
-  Example:
-  public_subnets = [
-  {
-    "v4_cidr_blocks" : ["10.121.0.0/16", "10.122.0.0/16"],
-    "zone" : "ru-central1-a"
-    "description" : "Custom public-subnet description"
-    "name" : "Custom public-subnet name"
-  },
-  {
-    "v4_cidr_blocks" : ["10.131.0.0/16"],
-    "zone" : "ru-central1-b"
-    "folder_id" : "xxxxxxx" # For Multi-Folder VPC
-  },
-  ]
+  (Optional) - The folder id in which the resources will be created, 
+  if not specified, will be taken from `yandex_client_config`
   EOF
-  type = list(object({
-    v4_cidr_blocks = list(string)
-    zone           = string
-    description    = optional(string)
-    name           = optional(string)
-    folder_id      = optional(string)
-  }))
+
+  type    = string
   default = null
 }
 
-variable "private_subnets" {
+variable "networks" {
   description = <<EOF
-  "Describe your private subnet preferences. For VMs without public IPs but with or without NAT gateway. For Multi-Folder VPC add folder_id to subnet object"
-  private_subnets = [
-  {
-    "v4_cidr_blocks" : ["10.221.0.0/16"],
-    "zone" : "ru-central1-a"
-    "description" : "Custom private-subnet description"
-    "name" : "Custom private-subnet name"
-  },
-  {
-    "v4_cidr_blocks" : ["10.231.0.0/16"],
-    "zone" : "ru-central1-b"
-    "folder_id" : "xxxxxxx" # For Multi-Folder VPC
-  },
-  ]
+  Networks with subnets configuration.
+
+  ---Important information---
+  If you want to specify a user's network, 
+  then specify its ID and not its name as the map() key.
+  ---------------------------
+
+  Placeholders explain where you should insert/come up with 
+  your own values for resources, in this case for network and subnet names.
+  Example: `<network-name>`
+
+  `<network-name|exist-network-id>`: The name of the network to be created or the ID of an existing network
+    `folder_id`: ID of the folder where the network will be hosted
+    `user_net`: If you specify an already created network, that is, its identifier, then you must specify (true), 
+                as if to say that this is a user network, for the networks that need to be created, use (false)
+    `subnets` Block for subnets configuration
+      `zone`: The availability zone where the subnet will be located
+      `v4_cidr_blocks`: IPv4 CIDR blocks for this subnet
+      `folder_id`: Id of the folder where the subnet will be located. If folder_id is specified for the network, 
+                   the ID will be taken from there, otherwise from var.folder_id
+      `labels`: Labels for this subnet. 
   EOF
-  type = list(object({
-    v4_cidr_blocks = list(string)
-    zone           = string
-    description    = optional(string)
-    name           = optional(string)
-    folder_id      = optional(string)
+
+  type = map(object({
+    folder_id = optional(string)
+    user_net  = bool
+    subnets = optional(map(object({
+      zone           = string
+      v4_cidr_blocks = list(string)
+      labels         = optional(map(string))
+    })), null)
   }))
   default = null
 }
 
-variable "create_nat_gw" {
-  description = "Create a NAT gateway for internet access from private subnets"
-  type        = bool
-  default     = true
-}
+variable "nat_gws" {
+  description = <<EOF
+  (Optional) - Which networks should create a NAT gateway,
+  If you want to create a NAT in an existing network, specify its ID as the key for map()
 
-variable "routes_public_subnets" {
-  description = "Describe your route preferences for public subnets"
-  type = list(object({
-    destination_prefix = string
-    next_hop_address   = string
+  Placeholders indicate where to put custom values, 
+  in this case these are the names or ids of the networks that act as keys for map()
+
+  `<network-name|network-id>`: The name or ID of an existing network for which you need to create a NAT gateway
+    `name`: Name of the NAT gateway
+  EOF
+
+  type = map(object({
+    name = optional(string, "nat-gw")
   }))
   default = null
 }
-variable "routes_private_subnets" {
-  description = "Describe your route preferences for public subnets"
-  type = list(object({
-    destination_prefix = string
-    next_hop_address   = string
+
+variable "route_table_public_subnets" {
+  description = <<EOF
+  (Optional) - Routing table for public network subnets.
+
+  Placeholders indicate where to put custom values, 
+  in this case these are the names or ids of the networks that act as keys for map()
+
+  ---Important information---
+  If you want to assign only a NAT gateway to private networks, then list only the list of these networks, 
+  without specifying routes, but note that you also need to create a NAT, that is, specify the network in var.nat_gws
+  ---------------------------
+
+  `<network-name|network-id>`: The name of the network or the ID of the existing 
+                               network for which subnets you need to create a routing table
+    `name`: Name of the route table
+    `subnets_names`: A list of subnets to which this routing table will be linked. Only subnets for `<network-name|network-id>`
+    `static_routes` Block for configure static routes
+      `destination_prefix`: Destination prefix
+      `next_hop_address`: Next hop
+  EOF
+
+  type = map(object({
+    name          = optional(string, "route_table_public")
+    subnets_names = list(string)
+    static_routes = list(object({
+      destination_prefix = string
+      next_hop_address   = string
+    }))
   }))
+
   default = null
 }
-variable "domain_name" {
-  type        = string
-  default     = "internal."
-  description = "Domain name to be added to DHCP options"
+
+variable "route_table_private_subnets" {
+  description = <<EOF
+  (Optional) - Routing table for private network subnets.
+
+  Placeholders indicate where to put custom values, 
+  in this case these are the names or ids of the networks that act as keys for map()
+
+  `<network-name|network-id>`: The name of the network or the ID of the existing 
+                               network for which subnets you need to create a routing table
+    `name`: Name of the route table
+    `subnets_names`: A list of subnets to which this routing table will be linked. Only subnets for `<network-name|network-id>`
+    `static_routes` Block for configure static routes
+      `destination_prefix`: Destination prefix
+      `next_hop_address`: Next hop
+  EOF
+
+  type = map(object({
+    name          = optional(string, "route_table_private")
+    subnets_names = list(string)
+    static_routes = optional(list(object({
+      destination_prefix = string
+      next_hop_address   = string
+    })), [])
+  }))
+
+  default = null
 }
 
-variable "domain_name_servers" {
-  type        = list(string)
-  default     = []
-  description = "Domain name servers to be added to DHCP options. Only ip addresses can be used"
-}
-variable "ntp_servers" {
-  type        = list(string)
-  default     = []
-  description = "NTP Servers for subnets. Only ip addresses can be used"
-}
-variable "labels" {
-  description = "Set of key/value label pairs to assign."
-  type        = map(string)
-  default = {
-    created_by = "terraform-yc-module"
-  }
+variable "sec_groups" {
+  description = <<EOF
+  (Optional) - Security groups for network.
+
+  Placeholders indicate where to put custom values, 
+  in this case these are the names or ids of the networks that act as keys for map()
+
+  `<network-name|network-id>`: The name or ID of the network for which you want to create a security group
+    `name`: Name of the security group
+    `ingress` The rules configuration block for incoming traffic
+      `description`: Description
+      `from_port`: The initial port that you want to open
+      `to_port`: Which port do you want to open ports to, if you want to open only one port, 
+                 then specify the same port in from_port and to_port
+      `v4_cidr_blocks`: IPv4 CIDR blocks for rule
+      `protocol` Protocol for rule
+      `predefined_target`: Special-purpose targets
+  EOF
+
+  type = map(object({
+    name = optional(string, "sec-group")
+    ingress = optional(list(object({
+      description       = optional(string)
+      from_port         = optional(number, -1)
+      to_port           = optional(number, -1)
+      v4_cidr_blocks    = optional(list(string))
+      protocol          = string
+    })), [])
+    egress = optional(list(object({
+      description       = optional(string)
+      from_port         = optional(number, -1)
+      to_port           = optional(number, -1)
+      v4_cidr_blocks    = optional(list(string))
+      protocol          = string
+    })), [])
+  }))
+
+  default = null
 }

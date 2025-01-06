@@ -1,82 +1,110 @@
-# Virtual Private Cloud (VPC) Terraform module for Yandex.Cloud
+# Terraform Yandex VPC Module
 
-## Features
+This Terraform module is designed for creating and managing Virtual Private Clouds (VPCs) in Yandex Cloud. It provides flexible options for creating networks, subnets, NAT gateways, route tables, and security groups.
 
-- Create Network and subnets in your folder
-- Supports MultiFolder VPC concept by adding folder_id to subnet object
-- Subnets can be both public for VMs with public IPs and private, with or without NAT gateway
-- Configure your default security group
-- Easy to use in other resources via outputs
+## Description
 
-### How to Configure Terraform for Yandex.Cloud
+The module allows you to create VPCs with various configurations, including:
 
-- Install [YC CLI](https://cloud.yandex.com/docs/cli/quickstart)
-- Add environment variables for terraform authentication in Yandex.Cloud
+•   **Networks:** Creating new networks or using existing ones.  
+•   **Subnets:** Creating subnets in different availability zones with customizable CIDR blocks.  
+•   **NAT Gateways:** Creating NAT gateways to provide internet access for resources in private subnets.  
+•   **Route Tables:** Configuring route tables for public and private subnets.  
+•   **Security Groups:** Creating security groups to manage inbound and outbound traffic.  
 
+The module is intended to simplify and standardize the process of creating VPCs in Yandex Cloud, making it more automated and reliable.  
+
+## Usage  
+
+To use the module, you need to define variable values in your Terraform configuration file. Below are the descriptions of the variables and an example of how to use them.  
+
+### Variables  
+
+#### `folder_id`  
+
+•   **(Optional)** The ID of the Yandex Cloud folder where the resources will be created. If not specified, the `folder_id` from the client configuration will be used.  
+•   **Type:** `string`  
+•   **Default:** `null`  
+
+#### `networks`  
+
+•   **(Optional)** Configuration of networks and subnets.  
+•   **Type:** `map(object(...))`  
+•   **Description:**  
 ```
-export YC_TOKEN=$(yc iam create-token)
-export YC_CLOUD_ID=$(yc config get cloud-id)
-export YC_FOLDER_ID=$(yc config get folder-id)
+    `folder_id`: (Optional) The folder ID to host the network.  
+    `user_net`: (Required) If `true`, an existing network will be used; otherwise, a new one will be created.  
+    `subnets`: (Optional) Map of subnets.  
+        `zone`: (Required) The availability zone for the subnet.  
+        `v4_cidr_blocks`: (Required) List of IPv4 CIDR blocks.  
+        `folder_id`: (Optional) The folder ID to host the subnet.  
+        `labels`: (Optional) Map of labels.
 ```
 
-<!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
-## Requirements
+#### `nat_gws`  
 
-| Name | Version |
-|------|---------|
-| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.0.0 |
-| <a name="requirement_yandex"></a> [yandex](#requirement\_yandex) | >= 0.101.0 |
+•   **(Optional)** Configuration of NAT gateways.  
+•   **Type:** `map(object(...))`  
+•   **Description:**  
+    •   `name`: (Optional) The name of the NAT gateway, defaults to "nat-gw".  
 
-## Providers
+#### `route_table_public_subnets`  
 
-| Name | Version |
-|------|---------|
-| <a name="provider_yandex"></a> [yandex](#provider\_yandex) | 0.122.0 |
+•   **(Optional)** Configuration of route tables for public subnets.  
+•   **Type:** `map(object(...))`  
+•   **Description:**  
+```
+    `name`: (Optional) The name of the route table, defaults to "route_table_public".  
+    `subnets_names`: (Required) List of subnet names.  
+        `static_routes`: (Optional) List of static routes.  
+            `destination_prefix`: (Required) The destination prefix.  
+            `next_hop_address`: (Required) The IP address of the next hop.
+```
 
-## Modules
+#### `route_table_private_subnets`  
 
-No modules.
+•   **(Optional)** Configuration of route tables for private subnets.  
+•   **Type:** `map(object(...))`  
+•   **Description:**  
+```
+    `name`: (Optional) The name of the route table, defaults to "route_table_private".  
+    `subnets_names`: (Required) List of subnet names.  
+    `static_routes`: (Optional) List of static routes.  
+        `destination_prefix`: (Required) The destination prefix.  
+        `next_hop_address`: (Required) The IP address of the next hop.
+```
 
-## Resources
+#### `sec_groups`  
 
-| Name | Type |
-|------|------|
-| [yandex_vpc_default_security_group.default_sg](https://registry.terraform.io/providers/yandex-cloud/yandex/latest/docs/resources/vpc_default_security_group) | resource |
-| [yandex_vpc_gateway.egress_gateway](https://registry.terraform.io/providers/yandex-cloud/yandex/latest/docs/resources/vpc_gateway) | resource |
-| [yandex_vpc_network.this](https://registry.terraform.io/providers/yandex-cloud/yandex/latest/docs/resources/vpc_network) | resource |
-| [yandex_vpc_route_table.private](https://registry.terraform.io/providers/yandex-cloud/yandex/latest/docs/resources/vpc_route_table) | resource |
-| [yandex_vpc_route_table.public](https://registry.terraform.io/providers/yandex-cloud/yandex/latest/docs/resources/vpc_route_table) | resource |
-| [yandex_vpc_subnet.private](https://registry.terraform.io/providers/yandex-cloud/yandex/latest/docs/resources/vpc_subnet) | resource |
-| [yandex_vpc_subnet.public](https://registry.terraform.io/providers/yandex-cloud/yandex/latest/docs/resources/vpc_subnet) | resource |
-| [yandex_client_config.client](https://registry.terraform.io/providers/yandex-cloud/yandex/latest/docs/data-sources/client_config) | data source |
+•   **(Optional)** Configuration of security groups.  
+•   **Type:** `map(object(...))`  
+•   **Description:**  
+```
+`name`: (Optional) The name of the security group, defaults to "sec-group".  
+    `ingress`: (Optional) List of rules for inbound traffic.  
+        `description`: (Optional) Description of the rule.  
+        `from_port`: (Optional) The starting port.  
+        `to_port`: (Optional) The ending port.  
+        `v4_cidr_blocks`: (Optional) List of IPv4 CIDR blocks.  
+        `protocol`: (Required) Protocol (e.g., tcp, udp, icmp).  
+    `egress`: (Optional) List of rules for outbound traffic. (Similar to `ingress`).
+```
 
-## Inputs
+### Outputs  
 
-| Name | Description | Type | Default | Required |
-|------|-------------|------|---------|:--------:|
-| <a name="input_create_nat_gw"></a> [create\_nat\_gw](#input\_create\_nat\_gw) | Create a NAT gateway for internet access from private subnets | `bool` | `true` | no |
-| <a name="input_create_sg"></a> [create\_sg](#input\_create\_sg) | Shows whether а security group for VCP object should be created | `bool` | `true` | no |
-| <a name="input_create_vpc"></a> [create\_vpc](#input\_create\_vpc) | Shows whether a VCP object should be created. If false, an existing `vpc_id` is required. | `bool` | `true` | no |
-| <a name="input_domain_name"></a> [domain\_name](#input\_domain\_name) | Domain name to be added to DHCP options | `string` | `"internal."` | no |
-| <a name="input_domain_name_servers"></a> [domain\_name\_servers](#input\_domain\_name\_servers) | Domain name servers to be added to DHCP options. Only ip addresses can be used | `list(string)` | `[]` | no |
-| <a name="input_folder_id"></a> [folder\_id](#input\_folder\_id) | Folder ID where the resources will be created | `string` | `null` | no |
-| <a name="input_labels"></a> [labels](#input\_labels) | Set of key/value label pairs to assign. | `map(string)` | <pre>{<br>  "created_by": "terraform yc module"<br>}</pre> | no |
-| <a name="input_network_description"></a> [network\_description](#input\_network\_description) | Optional description of this resource. Provide this property when you create the resource. | `string` | `"terraform-created"` | no |
-| <a name="input_network_name"></a> [network\_name](#input\_network\_name) | Prefix to be used with all the resources as an identifier | `string` | n/a | yes |
-| <a name="input_ntp_servers"></a> [ntp\_servers](#input\_ntp\_servers) | NTP Servers for subnets. Only ip addresses can be used | `list(string)` | `[]` | no |
-| <a name="input_private_subnets"></a> [private\_subnets](#input\_private\_subnets) | "Describe your private subnet preferences. For VMs without public IPs but with or without NAT gateway. For Multi-Folder VPC add folder\_id to subnet object"<br>  private\_subnets = [<br>  {<br>    "v4\_cidr\_blocks" : ["10.221.0.0/16"],<br>    "zone" : "ru-central1-a"<br>    "description" : "Custom private-subnet description"<br>    "name" : "Custom private-subnet name"<br>  },<br>  {<br>    "v4\_cidr\_blocks" : ["10.231.0.0/16"],<br>    "zone" : "ru-central1-b"<br>    "folder\_id" : "xxxxxxx" # For Multi-Folder VPC<br>  },<br>  ] | <pre>list(object({<br>    v4_cidr_blocks = list(string)<br>    zone           = string<br>    description    = optional(string)<br>    name           = optional(string)<br>    folder_id      = optional(string)<br>  }))</pre> | `null` | no |
-| <a name="input_public_subnets"></a> [public\_subnets](#input\_public\_subnets) | "Describe your public subnet preferences. For VMs with public IPs. For Multi-Folder VPC add folder\_ids to subnet objects"<br>  Example:<br>  public\_subnets = [<br>  {<br>    "v4\_cidr\_blocks" : ["10.121.0.0/16", "10.122.0.0/16"],<br>    "zone" : "ru-central1-a"<br>    "description" : "Custom public-subnet description"<br>    "name" : "Custom public-subnet name"<br>  },<br>  {<br>    "v4\_cidr\_blocks" : ["10.131.0.0/16"],<br>    "zone" : "ru-central1-b"<br>    "folder\_id" : "xxxxxxx" # For Multi-Folder VPC<br>  },<br>  ] | <pre>list(object({<br>    v4_cidr_blocks = list(string)<br>    zone           = string<br>    description    = optional(string)<br>    name           = optional(string)<br>    folder_id      = optional(string)<br>  }))</pre> | `null` | no |
-| <a name="input_routes_private_subnets"></a> [routes\_private\_subnets](#input\_routes\_private\_subnets) | Describe your route preferences for public subnets | <pre>list(object({<br>    destination_prefix = string<br>    next_hop_address   = string<br>  }))</pre> | `null` | no |
-| <a name="input_routes_public_subnets"></a> [routes\_public\_subnets](#input\_routes\_public\_subnets) | Describe your route preferences for public subnets | <pre>list(object({<br>    destination_prefix = string<br>    next_hop_address   = string<br>  }))</pre> | `null` | no |
-| <a name="input_vpc_id"></a> [vpc\_id](#input\_vpc\_id) | Existing `network_id` (`vpc-id`) where resources will be created | `string` | `null` | no |
+#### `networks`  
 
-## Outputs
+•   A map of networks and subnets with their IDs, zones, CIDR blocks, and route table IDs.  
 
-| Name | Description |
-|------|-------------|
-| <a name="output_private_subnets"></a> [private\_subnets](#output\_private\_subnets) | Map of private subnets: `key = first v4_cidr_block` |
-| <a name="output_private_v4_cidr_blocks"></a> [private\_v4\_cidr\_blocks](#output\_private\_v4\_cidr\_blocks) | List of `v4_cidr_blocks` used in the VPC network |
-| <a name="output_public_subnets"></a> [public\_subnets](#output\_public\_subnets) | Map of public subnets: `key = first v4_cidr_block` |
-| <a name="output_public_v4_cidr_blocks"></a> [public\_v4\_cidr\_blocks](#output\_public\_v4\_cidr\_blocks) | List of `v4_cidr_blocks` used in the VPC network |
-| <a name="output_vpc_id"></a> [vpc\_id](#output\_vpc\_id) | ID of the created network for internal communications |
-<!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
+#### `gateway_ids`  
+ 
+•   A map of NAT gateway IDs and their associated networks and subnets.  
+
+#### `sec_group_ids`  
+
+•   A map of security group IDs and their associated networks.  
+
+## Requirements  
+
+•   The code is written using Terraform v1.11.0-alpha20241218 on linux_amd64  
+•   Yandex Cloud Provider for Terraform  

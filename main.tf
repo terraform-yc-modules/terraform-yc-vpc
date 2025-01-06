@@ -76,7 +76,7 @@ resource "yandex_vpc_route_table" "public" {
 
 }
 resource "yandex_vpc_route_table" "private" {
-  count      = var.private_subnets == null ? 0 : 1
+  count      = var.private_subnets != null || var.create_nat_gw ? 1 : 0
   name       = "${var.network_name}-private"
   network_id = local.vpc_id
   folder_id  = local.folder_id

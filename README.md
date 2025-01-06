@@ -37,7 +37,6 @@ To use the module, you need to define variable values in your Terraform configur
     `subnets`: (Optional) Map of subnets.  
         `zone`: (Required) The availability zone for the subnet.  
         `v4_cidr_blocks`: (Required) List of IPv4 CIDR blocks.  
-        `folder_id`: (Optional) The folder ID to host the subnet.  
         `labels`: (Optional) Map of labels.
 ```
 

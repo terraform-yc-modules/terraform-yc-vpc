@@ -105,7 +105,9 @@ resource "yandex_vpc_route_table" "route_private_table" {
 
 resource "yandex_vpc_security_group" "sec_group" {
 
-  for_each = var.sec_groups != null ? var.sec_groups : {}
+  for_each = var.sec_groups != null && var.networks != null ? {
+    for sec_key, sec in var.sec_groups : sec_key => sec if contains(keys(var.networks), sec_key)
+  } : {}
 
   name       = each.value.name
   network_id = try(yandex_vpc_network.network[each.key].id, each.key)

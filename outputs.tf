@@ -32,9 +32,9 @@ output "gateway_ids" {
 output "sec_group_ids" {
   description = "ids of the security groups and the networks they are created for"
 
-  value = var.sec_groups != null ? {
-    for sec_key, sec in var.sec_groups : yandex_vpc_security_group.sec_group[sec_key].id => {
-      network_id = try(yandex_vpc_network.network[sec_key].id, sec_key)
+  value = yandex_vpc_security_group.sec_group != null ? {
+    for sec_key, sec in yandex_vpc_security_group.sec_group : yandex_vpc_security_group.sec_group[sec_key].id  => {
+      network_id = sec.network_id
     }
   } : {}
 }

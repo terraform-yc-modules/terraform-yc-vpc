@@ -1,9 +1,11 @@
+### Data
 data "yandex_client_config" "client" {}
 
 locals {
   folder_id = var.folder_id != null ? var.folder_id : data.yandex_client_config.client.folder_id
 }
 
+### Creating networks based on the var.networks variable
 resource "yandex_vpc_network" "network" {
 
   for_each = var.networks != null ? {
@@ -16,6 +18,7 @@ resource "yandex_vpc_network" "network" {
   folder_id = each.value.folder_id
 }
 
+### Creating subnets
 resource "yandex_vpc_subnet" "subnets" {
 
   for_each = var.networks != null ? tomap({
@@ -48,6 +51,7 @@ resource "yandex_vpc_subnet" "subnets" {
   labels = each.value.labels
 }
 
+### Creating a NAT gateway
 resource "yandex_vpc_gateway" "nat_gw" {
 
   for_each = var.nat_gws != null ? var.nat_gws : {}
@@ -58,6 +62,7 @@ resource "yandex_vpc_gateway" "nat_gw" {
   shared_egress_gateway {}
 }
 
+### Routing table for public networks
 resource "yandex_vpc_route_table" "route_pub_table" {
 
   for_each = var.route_table_public_subnets != null && var.networks != null ? {
@@ -78,6 +83,7 @@ resource "yandex_vpc_route_table" "route_pub_table" {
   }
 }
 
+### Routing table for private networks
 resource "yandex_vpc_route_table" "route_private_table" {
 
   for_each = var.route_table_private_subnets != null && var.networks != null ? {
@@ -107,6 +113,7 @@ resource "yandex_vpc_route_table" "route_private_table" {
   }
 }
 
+### Creating a security group
 resource "yandex_vpc_security_group" "sec_group" {
 
   for_each = var.sec_groups != null && var.networks != null ? {

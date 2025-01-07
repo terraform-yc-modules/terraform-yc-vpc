@@ -52,7 +52,7 @@ resource "yandex_vpc_gateway" "nat_gw" {
 
   for_each = var.nat_gws != null ? var.nat_gws : {}
 
-  folder_id = try(yandex_vpc_network.network[each.key].folder_id, var.networks != null ? lookup(var.networks[each.key], "folder_id", local.folder_id) : local.folder_id)
+  folder_id = try(yandex_vpc_network.network[each.key].folder_id, try(lookup(var.networks[each.key], "folder_id", local.folder_id), local.folder_id))
   name      = each.value.name
 
   shared_egress_gateway {}

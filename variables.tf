@@ -28,8 +28,10 @@ variable "networks" {
     `subnets` Block for subnets configuration
       `zone`: The availability zone where the subnet will be located
       `v4_cidr_blocks`: IPv4 CIDR blocks for this subnet
-      `folder_id`: Id of the folder where the subnet will be located. If folder_id is specified for the network, 
-                   the ID will be taken from there, otherwise from var.folder_id
+      `dhcp_options` Block for dhck configure
+        `domain_name`: Domain name
+        `domain_name_servers`: Domain name servers
+        `ntp_servers`: Ntp servers
       `labels`: Labels for this subnet. 
   EOF
 
@@ -145,7 +147,6 @@ variable "sec_groups" {
                  then specify the same port in from_port and to_port
       `v4_cidr_blocks`: IPv4 CIDR blocks for rule
       `protocol` Protocol for rule
-      `predefined_target`: Special-purpose targets
   EOF
 
   type = map(object({

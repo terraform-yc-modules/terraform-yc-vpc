@@ -1,7 +1,7 @@
 variable "folder_id" {
   description = <<EOF
   (Optional) - The folder id in which the resources will be created, 
-  if not specified, will be taken from `yandex_client_config`
+  if not specified, will be taken from yandex_client_config
   EOF
 
   type    = string
@@ -19,20 +19,20 @@ variable "networks" {
 
   Placeholders explain where you should insert/come up with 
   your own values for resources, in this case for network and subnet names.
-  Example: `<network-name>`
+  Example: <network-name>
 
-  `<network-name|exist-network-id>`: The name of the network to be created or the ID of an existing network
-    `folder_id`: ID of the folder where the network will be hosted
-    `user_net`: If you specify an already created network, that is, its identifier, then you must specify (true), 
+  <network-name|exist-network-id>: The name of the network to be created or the ID of an existing network
+    folder_id: ID of the folder where the network will be hosted
+    user_net: If you specify an already created network, that is, its identifier, then you must specify (true), 
                 as if to say that this is a user network, for the networks that need to be created, use (false)
-    `subnets` Block for subnets configuration
-      `zone`: The availability zone where the subnet will be located
-      `v4_cidr_blocks`: IPv4 CIDR blocks for this subnet
-      `dhcp_options` Block for dhck configure
-        `domain_name`: Domain name
-        `domain_name_servers`: Domain name servers
-        `ntp_servers`: Ntp servers
-      `labels`: Labels for this subnet. 
+    subnets Block for subnets configuration
+      zone: The availability zone where the subnet will be located
+      v4_cidr_blocks: IPv4 CIDR blocks for this subnet
+      dhcp_options Block for dhck configure
+        domain_name: Domain name
+        domain_name_servers: Domain name servers
+        ntp_servers: Ntp servers
+      labels: Labels for this subnet. 
   EOF
 
   type = map(object({
@@ -60,8 +60,8 @@ variable "nat_gws" {
   Placeholders indicate where to put custom values, 
   in this case these are the names or ids of the networks that act as keys for map()
 
-  `<network-name|network-id>`: The name or ID of an existing network for which you need to create a NAT gateway
-    `name`: Name of the NAT gateway
+  <network-name|network-id>: The name or ID of an existing network for which you need to create a NAT gateway
+    name: Name of the NAT gateway
   EOF
 
   type = map(object({
@@ -82,13 +82,13 @@ variable "route_table_public_subnets" {
   without specifying routes, but note that you also need to create a NAT, that is, specify the network in var.nat_gws
   ---------------------------
 
-  `<network-name|network-id>`: The name of the network or the ID of the existing 
+  <network-name|network-id>: The name of the network or the ID of the existing 
                                network for which subnets you need to create a routing table
-    `name`: Name of the route table
-    `subnets_names`: A list of subnets to which this routing table will be linked. Only subnets for `<network-name|network-id>`
-    `static_routes` Block for configure static routes
-      `destination_prefix`: Destination prefix
-      `next_hop_address`: Next hop
+    name: Name of the route table
+    subnets_names: A list of subnets to which this routing table will be linked. Only subnets for <network-name|network-id>
+    static_routes Block for configure static routes
+      destination_prefix: Destination prefix
+      next_hop_address: Next hop
   EOF
 
   type = map(object({
@@ -110,13 +110,13 @@ variable "route_table_private_subnets" {
   Placeholders indicate where to put custom values, 
   in this case these are the names or ids of the networks that act as keys for map()
 
-  `<network-name|network-id>`: The name of the network or the ID of the existing 
+  <network-name|network-id>: The name of the network or the ID of the existing 
                                network for which subnets you need to create a routing table
-    `name`: Name of the route table
-    `subnets_names`: A list of subnets to which this routing table will be linked. Only subnets for `<network-name|network-id>`
-    `static_routes` Block for configure static routes
-      `destination_prefix`: Destination prefix
-      `next_hop_address`: Next hop
+    name: Name of the route table
+    subnets_names: A list of subnets to which this routing table will be linked. Only subnets for <network-name|network-id>
+    static_routes Block for configure static routes
+      destination_prefix: Destination prefix
+      next_hop_address: Next hop
   EOF
 
   type = map(object({
@@ -138,15 +138,15 @@ variable "sec_groups" {
   Placeholders indicate where to put custom values, 
   in this case these are the names or ids of the networks that act as keys for map()
 
-  `<network-name|network-id>`: The name or ID of the network for which you want to create a security group
-    `name`: Name of the security group
-    `ingress` The rules configuration block for incoming traffic
-      `description`: Description
-      `from_port`: The initial port that you want to open
-      `to_port`: Which port do you want to open ports to, if you want to open only one port, 
+  <network-name|network-id>: The name or ID of the network for which you want to create a security group
+    name: Name of the security group
+    ingress The rules configuration block for incoming traffic
+      description: Description
+      from_port: The initial port that you want to open
+      to_port: Which port do you want to open ports to, if you want to open only one port, 
                  then specify the same port in from_port and to_port
-      `v4_cidr_blocks`: IPv4 CIDR blocks for rule
-      `protocol` Protocol for rule
+      v4_cidr_blocks: IPv4 CIDR blocks for rule
+      protocol Protocol for rule
   EOF
 
   type = map(object({

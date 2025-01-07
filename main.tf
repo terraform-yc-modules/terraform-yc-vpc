@@ -60,7 +60,9 @@ resource "yandex_vpc_gateway" "nat_gw" {
 
 resource "yandex_vpc_route_table" "route_pub_table" {
 
-  for_each = var.route_table_public_subnets != null ? var.route_table_public_subnets : {}
+  for_each = var.route_table_public_subnets != null && var.networks != null ? {
+    for routetab_key, routetab in var.route_table_public_subnets : routetab_key => routetab if contains(keys(var.networks), routetab_key)
+  } : {}
 
   name       = each.value.name
   network_id = try(yandex_vpc_network.network[each.key].id, each.key)
@@ -78,7 +80,9 @@ resource "yandex_vpc_route_table" "route_pub_table" {
 
 resource "yandex_vpc_route_table" "route_private_table" {
 
-  for_each = var.route_table_private_subnets != null ? var.route_table_private_subnets : {}
+  for_each = var.route_table_private_subnets != null && var.networks != null ? {
+    for routetab_key, routetab in var.route_table_private_subnets : routetab_key => routetab if contains(keys(var.networks), routetab_key)
+  } : {}
 
   name       = each.value.name
   network_id = try(yandex_vpc_network.network[each.key].id, each.key)
@@ -94,7 +98,7 @@ resource "yandex_vpc_route_table" "route_private_table" {
   }
 
   dynamic "static_route" {
-    for_each = var.nat_gws != null && try(yandex_vpc_gateway.nat_gw[each.key].id, null) != null ? yandex_vpc_gateway.nat_gw : {}
+    for_each = var.nat_gws != null && try(yandex_vpc_gateway.nat_gw[each.key].id, false) ? yandex_vpc_gateway.nat_gw : {}
 
     content {
       destination_prefix = "0.0.0.0/0"

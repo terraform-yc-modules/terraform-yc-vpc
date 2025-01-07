@@ -22,12 +22,13 @@ resource "yandex_vpc_subnet" "subnets" {
     for subnet in flatten([
       for net_key, net in var.networks : [try(net.subnets, null) != null ?
         [for sub_key, sub in net.subnets : {
-          network        = net_key
-          subnet_name    = sub_key
-          zone           = sub.zone
-          network_id     = net.user_net ? net_key : yandex_vpc_network.network[net_key].id
-          v4_cidr_blocks = sub.v4_cidr_blocks
           folder_id      = lookup(net, "folder_id", local.folder_id)
+          network        = net_key
+          network_id     = net.user_net ? net_key : yandex_vpc_network.network[net_key].id
+          subnet_name    = sub_key
+          v4_cidr_blocks = sub.v4_cidr_blocks
+          zone           = sub.zone
+          dhcp_options   = sub.dhcp_options
           labels         = sub.labels
       }] : []]
     ]) : "${subnet.network}.${subnet.subnet_name}" => subnet
@@ -39,7 +40,12 @@ resource "yandex_vpc_subnet" "subnets" {
   network_id     = each.value.network_id
   folder_id      = each.value.folder_id
   route_table_id = try(contains(var.route_table_public_subnets[each.value.network].subnets_names, each.value.subnet_name), false) ? yandex_vpc_route_table.route_pub_table[each.value.network].id : try(contains(var.route_table_private_subnets[each.value.network].subnets_names, each.value.subnet_name), false) ? yandex_vpc_route_table.route_private_table[each.value.network].id : null
-  labels         = each.value.labels
+  dhcp_options {
+    domain_name         = each.value.dhcp_options.domain_name
+    domain_name_servers = each.value.dhcp_options.domain_name_servers
+    ntp_servers         = each.value.dhcp_options.ntp_servers
+  }
+  labels = each.value.labels
 }
 
 resource "yandex_vpc_gateway" "nat_gw" {
@@ -109,11 +115,11 @@ resource "yandex_vpc_security_group" "sec_group" {
     for_each = each.value.ingress
 
     content {
-      description       = ingress.value.description
-      from_port         = ingress.value.from_port
-      to_port           = ingress.value.to_port
-      v4_cidr_blocks    = ingress.value.v4_cidr_blocks
-      protocol          = ingress.value.protocol
+      description    = ingress.value.description
+      from_port      = ingress.value.from_port
+      to_port        = ingress.value.to_port
+      v4_cidr_blocks = ingress.value.v4_cidr_blocks
+      protocol       = ingress.value.protocol
     }
   }
 
@@ -121,11 +127,11 @@ resource "yandex_vpc_security_group" "sec_group" {
     for_each = each.value.egress
 
     content {
-      description       = egress.value.description
-      from_port         = egress.value.from_port
-      to_port           = egress.value.to_port
-      v4_cidr_blocks    = egress.value.v4_cidr_blocks
-      protocol          = egress.value.protocol
+      description    = egress.value.description
+      from_port      = egress.value.from_port
+      to_port        = egress.value.to_port
+      v4_cidr_blocks = egress.value.v4_cidr_blocks
+      protocol       = egress.value.protocol
     }
   }
 }

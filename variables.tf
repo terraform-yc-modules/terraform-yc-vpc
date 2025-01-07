@@ -39,7 +39,12 @@ variable "networks" {
     subnets = optional(map(object({
       zone           = string
       v4_cidr_blocks = list(string)
-      labels         = optional(map(string))
+      dhcp_options = optional(object({
+        domain_name         = optional(string, "internal.")
+        domain_name_servers = optional(list(string), [])
+        ntp_servers         = optional(list(string), [])
+      }), {})
+      labels = optional(map(string))
     })), null)
   }))
   default = null
@@ -146,18 +151,18 @@ variable "sec_groups" {
   type = map(object({
     name = optional(string, "sec-group")
     ingress = optional(list(object({
-      description       = optional(string)
-      from_port         = optional(number, -1)
-      to_port           = optional(number, -1)
-      v4_cidr_blocks    = optional(list(string))
-      protocol          = string
+      description    = optional(string)
+      from_port      = optional(number, -1)
+      to_port        = optional(number, -1)
+      v4_cidr_blocks = optional(list(string))
+      protocol       = string
     })), [])
     egress = optional(list(object({
-      description       = optional(string)
-      from_port         = optional(number, -1)
-      to_port           = optional(number, -1)
-      v4_cidr_blocks    = optional(list(string))
-      protocol          = string
+      description    = optional(string)
+      from_port      = optional(number, -1)
+      to_port        = optional(number, -1)
+      v4_cidr_blocks = optional(list(string))
+      protocol       = string
     })), [])
   }))
 

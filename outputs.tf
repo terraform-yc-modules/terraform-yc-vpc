@@ -4,10 +4,10 @@ output "networks" {
   value = var.networks != null ? {
     for net_key, net in var.networks : try(yandex_vpc_network.network[net_key].id, net_key) => net.subnets != null ? [
       for sub_key, sub in net.subnets : {
-        subnet_id      = yandex_vpc_subnet.subnets["${net_key}.${sub_key}"].id
-        zone           = yandex_vpc_subnet.subnets["${net_key}.${sub_key}"].zone
-        v4_cidr_blocks = yandex_vpc_subnet.subnets["${net_key}.${sub_key}"].v4_cidr_blocks
-        route_table_id = try(contains(var.route_table_public_subnets[net_key].subnets_names, sub_key), false) ? yandex_vpc_route_table.route_pub_table[net_key].id : try(contains(var.route_table_private_subnets[net_key].subnets_names, sub_key), false) ? yandex_vpc_route_table.route_private_table[net_key].id : null
+        subnet_id        = yandex_vpc_subnet.subnets["${net_key}.${sub_key}"].id
+        zone             = yandex_vpc_subnet.subnets["${net_key}.${sub_key}"].zone
+        v4_cidr_blocks   = yandex_vpc_subnet.subnets["${net_key}.${sub_key}"].v4_cidr_blocks
+        route_table_id   = try(contains(var.route_table_public_subnets[net_key].subnets_names, sub_key), false) ? yandex_vpc_route_table.route_pub_table[net_key].id : try(contains(var.route_table_private_subnets[net_key].subnets_names, sub_key), false) ? yandex_vpc_route_table.route_private_table[net_key].id : null
         subnet_is_public = try(contains(var.route_table_public_subnets[net_key].subnets_names, sub_key), false) ? true : false
       }
     ] : []

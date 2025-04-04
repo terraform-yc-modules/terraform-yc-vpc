@@ -59,6 +59,14 @@ variable "public_subnets" {
     folder_id      = optional(string)
   }))
   default = null
+  validation {
+    condition = var.public_subnets == null || alltrue([
+      for subnet in var.public_subnets :
+      length(subnet.v4_cidr_blocks) > 0 &&
+      alltrue([for cidr in subnet.v4_cidr_blocks : can(cidrnetmask(cidr))])
+    ])
+    error_message = "All CIDR blocks must be valid IPv4 CIDR notation."
+  }
 }
 
 variable "private_subnets" {
@@ -86,6 +94,14 @@ variable "private_subnets" {
     folder_id      = optional(string)
   }))
   default = null
+  validation {
+    condition = var.private_subnets == null || alltrue([
+      for subnet in var.private_subnets :
+      length(subnet.v4_cidr_blocks) > 0 &&
+      alltrue([for cidr in subnet.v4_cidr_blocks : can(cidrnetmask(cidr))])
+    ])
+    error_message = "All CIDR blocks must be valid IPv4 CIDR notation."
+  }
 }
 
 variable "create_nat_gw" {

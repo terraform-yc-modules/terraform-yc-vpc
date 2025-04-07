@@ -149,7 +149,7 @@ variable "labels" {
     created_by = "terraform-yc-module"
   }
 }
-variable "create_s3_pe" {
+variable "s3_private_endpoint" {
   type = object({
     enable                      = optional(bool, false)
     private_dns_records_enabled = optional(bool, true)
@@ -158,5 +158,5 @@ variable "create_s3_pe" {
     }
   )
   default     = {}
-  description = "Create private endpoint for Object Storage. Subnet v4_cidr_block and ip address from it can be set"
+  description = "Configuration for creating a private endpoint for Yandex Object Storage. When enabled, creates a secure connection to Object Storage without going through the public internet. Specify a subnet CIDR block and an IP address for the endpoint from one of the 'privite subnet's CIDR block'."
 }

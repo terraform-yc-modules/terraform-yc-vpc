@@ -100,7 +100,7 @@ graph TD
 
 | Name | Version |
 |------|---------|
-| <a name="provider_yandex"></a> [yandex](#provider\_yandex) | 0.129.0 |
+| <a name="provider_yandex"></a> [yandex](#provider\_yandex) | 0.140.1 |
 
 ## Modules
 
@@ -125,7 +125,6 @@ No modules.
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
 | <a name="input_create_nat_gw"></a> [create\_nat\_gw](#input\_create\_nat\_gw) | Create a NAT gateway for internet access from private subnets | `bool` | `true` | no |
-| <a name="input_create_s3_pe"></a> [create\_s3\_pe](#input\_create\_s3\_pe) | Create private endpoint for Object Storage. Subnet v4\_cidr\_block and ip address from it can be set | <pre>object({<br/>    enable                      = optional(bool, false)<br/>    private_dns_records_enabled = optional(bool, true)<br/>    subnet_v4_cidr_block        = optional(string, null)<br/>    address                     = optional(string, null)<br/>    }<br/>  )</pre> | `{}` | no |
 | <a name="input_create_sg"></a> [create\_sg](#input\_create\_sg) | Shows whether а security group for VCP object should be created | `bool` | `true` | no |
 | <a name="input_create_vpc"></a> [create\_vpc](#input\_create\_vpc) | Shows whether a VCP object should be created. If false, an existing `vpc_id` is required. | `bool` | `true` | no |
 | <a name="input_domain_name"></a> [domain\_name](#input\_domain\_name) | Domain name to be added to DHCP options | `string` | `"internal."` | no |
@@ -139,6 +138,7 @@ No modules.
 | <a name="input_public_subnets"></a> [public\_subnets](#input\_public\_subnets) | "Describe your public subnet preferences. For VMs with public IPs. For Multi-Folder VPC add folder\_ids to subnet objects"<br/>  Example:<br/>  public\_subnets = [<br/>  {<br/>    "v4\_cidr\_blocks" : ["10.121.0.0/16", "10.122.0.0/16"],<br/>    "zone" : "ru-central1-a"<br/>    "description" : "Custom public-subnet description"<br/>    "name" : "Custom public-subnet name"<br/>  },<br/>  {<br/>    "v4\_cidr\_blocks" : ["10.131.0.0/16"],<br/>    "zone" : "ru-central1-b"<br/>    "folder\_id" : "xxxxxxx" # For Multi-Folder VPC<br/>  },<br/>  ] | <pre>list(object({<br/>    v4_cidr_blocks = list(string)<br/>    zone           = string<br/>    description    = optional(string)<br/>    name           = optional(string)<br/>    folder_id      = optional(string)<br/>  }))</pre> | `null` | no |
 | <a name="input_routes_private_subnets"></a> [routes\_private\_subnets](#input\_routes\_private\_subnets) | Describe your route preferences for public subnets | <pre>list(object({<br/>    destination_prefix = string<br/>    next_hop_address   = string<br/>  }))</pre> | `null` | no |
 | <a name="input_routes_public_subnets"></a> [routes\_public\_subnets](#input\_routes\_public\_subnets) | Describe your route preferences for public subnets | <pre>list(object({<br/>    destination_prefix = string<br/>    next_hop_address   = string<br/>  }))</pre> | `null` | no |
+| <a name="input_s3_private_endpoint"></a> [s3\_private\_endpoint](#input\_s3\_private\_endpoint) | Configuration for creating a private endpoint for Yandex Object Storage. When enabled, creates a secure connection to Object Storage without going through the public internet. Specify a subnet CIDR block and an IP address for the endpoint from one of the 'privite subnet's CIDR block'. | <pre>object({<br/>    enable                      = optional(bool, false)<br/>    private_dns_records_enabled = optional(bool, true)<br/>    subnet_v4_cidr_block        = optional(string, null)<br/>    address                     = optional(string, null)<br/>    }<br/>  )</pre> | `{}` | no |
 | <a name="input_vpc_id"></a> [vpc\_id](#input\_vpc\_id) | Existing `network_id` (`vpc-id`) where resources will be created | `string` | `null` | no |
 
 ## Outputs

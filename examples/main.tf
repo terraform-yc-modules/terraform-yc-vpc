@@ -2,9 +2,9 @@ module "net" {
   source              = "../"
   labels              = { tag = "example" }
   network_description = "terraform-created"
-  network_name        = "net-module-example"
+  network_name        = "vpc-module-example"
   create_vpc          = true
-  create_s3_pe = {
+  s3_private_endpoint = {
     enable = true
   }
   public_subnets = [

@@ -59,6 +59,14 @@ variable "public_subnets" {
     folder_id      = optional(string)
   }))
   default = null
+  validation {
+    condition = var.public_subnets == null || alltrue([
+      for subnet in var.public_subnets :
+      length(subnet.v4_cidr_blocks) > 0 &&
+      alltrue([for cidr in subnet.v4_cidr_blocks : can(cidrnetmask(cidr))])
+    ])
+    error_message = "All CIDR blocks must be valid IPv4 CIDR notation."
+  }
 }
 
 variable "private_subnets" {
@@ -86,6 +94,14 @@ variable "private_subnets" {
     folder_id      = optional(string)
   }))
   default = null
+  validation {
+    condition = var.private_subnets == null || alltrue([
+      for subnet in var.private_subnets :
+      length(subnet.v4_cidr_blocks) > 0 &&
+      alltrue([for cidr in subnet.v4_cidr_blocks : can(cidrnetmask(cidr))])
+    ])
+    error_message = "All CIDR blocks must be valid IPv4 CIDR notation."
+  }
 }
 
 variable "create_nat_gw" {
@@ -132,4 +148,15 @@ variable "labels" {
   default = {
     created_by = "terraform-yc-module"
   }
+}
+variable "s3_private_endpoint" {
+  type = object({
+    enable                      = optional(bool, false)
+    private_dns_records_enabled = optional(bool, true)
+    subnet_v4_cidr_block        = optional(string, null)
+    address                     = optional(string, null)
+    }
+  )
+  default     = {}
+  description = "Configuration for creating a private endpoint for Yandex Object Storage. When enabled, creates a secure connection to Object Storage without going through the public internet. Specify a subnet CIDR block and an IP address for the endpoint from one of the 'privite subnet's CIDR block'."
 }

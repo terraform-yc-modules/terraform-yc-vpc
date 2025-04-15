@@ -35,3 +35,13 @@ output "private_subnets" {
     }
   }
 }
+
+output "s3_private_endpoint_id" {
+  description = "S3 Private Endpoint ID"
+  value       = var.s3_private_endpoint.enable ? yandex_vpc_private_endpoint.object_storage[0].id : null
+}
+
+output "s3_private_endpoint_ip" {
+  description = "S3 Private Endpoint IP address"
+  value       = var.s3_private_endpoint.enable ? yandex_vpc_private_endpoint.object_storage[0].endpoint_address[0].address : null
+}

@@ -135,14 +135,14 @@ resource "yandex_vpc_default_security_group" "default_sg" {
 
   }
   ingress {
-    protocol       = "ANY"
+    protocol       = "TCP"
     description    = "ssh"
     v4_cidr_blocks = ["0.0.0.0/0"]
     port           = 22
 
   }
   ingress {
-    protocol       = "ANY"
+    protocol       = "TCP"
     description    = "RDP"
     v4_cidr_blocks = ["0.0.0.0/0"]
     port           = 3389
@@ -164,7 +164,7 @@ resource "yandex_vpc_default_security_group" "default_sg" {
 
   egress {
     protocol       = "ANY"
-    description    = "To internet"
+    description    = "To the Internet"
     v4_cidr_blocks = ["0.0.0.0/0"]
   }
 }

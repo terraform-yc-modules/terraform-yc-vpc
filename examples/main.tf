@@ -4,9 +4,9 @@ module "net" {
   network_description = "terraform-created"
   network_name        = "vpc-module-example"
   create_vpc          = true
-  s3_private_endpoint = {
-    enable = true
-  }
+  # s3_private_endpoint = {
+  #   enable = true
+  # }
   public_subnets = [
     {
       "v4_cidr_blocks" : ["10.121.0.0/16"],
@@ -35,12 +35,6 @@ module "net" {
       "zone" : "ru-central1-d"
     },
   ]
-  # routes_public_subnets = [
-  #   {
-  #     destination_prefix : "172.16.0.0/16",
-  #     next_hop_address : "10.131.0.10"
-  #   },
-  # ]
   routes_private_subnets = [
     {
       destination_prefix : "172.16.0.0/16",

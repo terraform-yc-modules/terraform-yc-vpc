@@ -58,9 +58,9 @@ variable "public_subnets" {
     name           = optional(string)
     folder_id      = optional(string)
   }))
-  default = null
+  default = []
   validation {
-    condition = var.public_subnets == null || alltrue([
+    condition = var.public_subnets == [] || alltrue([
       for subnet in var.public_subnets :
       length(subnet.v4_cidr_blocks) > 0 &&
       alltrue([for cidr in subnet.v4_cidr_blocks : can(cidrnetmask(cidr))])
@@ -93,9 +93,9 @@ variable "private_subnets" {
     name           = optional(string)
     folder_id      = optional(string)
   }))
-  default = null
+  default = []
   validation {
-    condition = var.private_subnets == null || alltrue([
+    condition = var.private_subnets == [] || alltrue([
       for subnet in var.private_subnets :
       length(subnet.v4_cidr_blocks) > 0 &&
       alltrue([for cidr in subnet.v4_cidr_blocks : can(cidrnetmask(cidr))])
@@ -158,5 +158,5 @@ variable "s3_private_endpoint" {
     }
   )
   default     = {}
-  description = "Configuration for creating a private endpoint for Yandex Object Storage. When enabled, creates a secure connection to Object Storage without going through the public internet. Specify a subnet CIDR block and an IP address for the endpoint from one of the 'privite subnet's CIDR block'."
+  description = "Configuration for creating a private endpoint for Yandex Object Storage. When enabled, creates a secure connection to Object Storage without going through the public internet. Specify a subnet CIDR block and an IP address for the endpoint from one of the 'privite subnet's CIDR block'. At least one private subnet must be defined when s3_private_endpoint is enabled."
 }

@@ -2,8 +2,8 @@
 data "yandex_client_config" "client" {
   lifecycle {
     precondition {
-      condition     = var.create_vpc || var.vpc_id != null
-      error_message = "vpc_id must be set when create_vpc is false."
+      condition     = var.create_vpc || trimspace(coalesce(var.vpc_id, "")) != ""
+      error_message = "vpc_id must be non-empty when create_vpc is false."
     }
 
     precondition {

@@ -1,10 +1,28 @@
 ### Datasource
-data "yandex_client_config" "client" {}
+data "yandex_client_config" "client" {
+  lifecycle {
+    precondition {
+      condition     = var.create_vpc || var.vpc_id != null
+      error_message = "vpc_id must be set when create_vpc is false."
+    }
+
+    precondition {
+      condition     = !var.s3_private_endpoint.enable || length(var.private_subnets) > 0
+      error_message = "At least one private subnet must be configured when s3_private_endpoint.enable is true."
+    }
+
+    precondition {
+      condition     = !var.s3_private_endpoint.enable || (var.s3_private_endpoint.subnet_v4_cidr_block == null ? true : contains([for subnet in var.private_subnets : subnet.v4_cidr_blocks[0]], var.s3_private_endpoint.subnet_v4_cidr_block))
+      error_message = "s3_private_endpoint.subnet_v4_cidr_block must match the first IPv4 CIDR block of a configured private subnet."
+    }
+  }
+}
 
 ### Locals
 locals {
-  folder_id = var.folder_id == null ? data.yandex_client_config.client.folder_id : var.folder_id
-  vpc_id    = var.create_vpc ? yandex_vpc_network.this[0].id : var.vpc_id
+  folder_id                                = var.folder_id == null ? data.yandex_client_config.client.folder_id : var.folder_id
+  vpc_id                                   = var.create_vpc ? yandex_vpc_network.this[0].id : var.vpc_id
+  s3_private_endpoint_subnet_v4_cidr_block = var.s3_private_endpoint.subnet_v4_cidr_block == null ? try(var.private_subnets[0].v4_cidr_blocks[0], null) : var.s3_private_endpoint.subnet_v4_cidr_block
 }
 
 ### Network
@@ -54,14 +72,14 @@ resource "yandex_vpc_subnet" "private" {
 
 ## Routes
 resource "yandex_vpc_gateway" "egress_gateway" {
-  count     = var.create_nat_gw && var.private_subnets != null ? 1 : 0
+  count     = var.create_nat_gw && length(var.private_subnets) > 0 ? 1 : 0
   name      = "${var.network_name}-egress-gateway"
   folder_id = local.folder_id
   shared_egress_gateway {}
 }
 
 resource "yandex_vpc_route_table" "public" {
-  count      = var.public_subnets == null ? 0 : 1
+  count      = length(var.public_subnets) > 0 ? 1 : 0
   name       = "${var.network_name}-public"
   network_id = local.vpc_id
   folder_id  = local.folder_id
@@ -76,7 +94,7 @@ resource "yandex_vpc_route_table" "public" {
 
 }
 resource "yandex_vpc_route_table" "private" {
-  count      = var.private_subnets == null ? 0 : 1
+  count      = length(var.private_subnets) > 0 ? 1 : 0
   name       = "${var.network_name}-private"
   network_id = local.vpc_id
   folder_id  = local.folder_id
@@ -115,7 +133,7 @@ resource "yandex_vpc_private_endpoint" "object_storage" {
   }
 
   endpoint_address {
-    subnet_id = var.s3_private_endpoint.subnet_v4_cidr_block == null ? yandex_vpc_subnet.private[var.private_subnets[0].v4_cidr_blocks[0]].id : yandex_vpc_subnet.private[var.s3_private_endpoint.subnet_v4_cidr_block].id
+    subnet_id = yandex_vpc_subnet.private[local.s3_private_endpoint_subnet_v4_cidr_block].id
     address   = var.s3_private_endpoint.address
   }
 }

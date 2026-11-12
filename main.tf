@@ -2,7 +2,7 @@
 data "yandex_client_config" "client" {
   lifecycle {
     precondition {
-      condition     = var.create_vpc || trimspace(coalesce(var.vpc_id, "")) != ""
+      condition     = var.create_vpc ? true : try(trimspace(var.vpc_id) != "", false)
       error_message = "vpc_id must be non-empty when create_vpc is false."
     }
 

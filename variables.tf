@@ -13,7 +13,7 @@ variable "create_sg" {
 variable "vpc_id" {
   type        = string
   default     = null
-  description = "Existing `network_id` (`vpc-id`) where resources will be created"
+  description = "Existing `network_id` (`vpc-id`) where resources will be created. Required when `create_vpc` is false."
 }
 
 variable "network_name" {
@@ -105,7 +105,7 @@ variable "private_subnets" {
 }
 
 variable "create_nat_gw" {
-  description = "Create a NAT gateway for internet access from private subnets"
+  description = "Create a NAT gateway for internet access from private subnets. No gateway is created when private_subnets is empty."
   type        = bool
   default     = true
 }

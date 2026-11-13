@@ -93,14 +93,14 @@ graph TD
 
 | Name | Version |
 |------|---------|
-| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.0.0 |
-| <a name="requirement_yandex"></a> [yandex](#requirement\_yandex) | >= 0.101.0 |
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.3.0 |
+| <a name="requirement_yandex"></a> [yandex](#requirement\_yandex) | >= 0.225.0 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| <a name="provider_yandex"></a> [yandex](#provider\_yandex) | 0.140.1 |
+| <a name="provider_yandex"></a> [yandex](#provider\_yandex) | 0.225.0 |
 
 ## Modules
 
@@ -124,7 +124,7 @@ No modules.
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| <a name="input_create_nat_gw"></a> [create\_nat\_gw](#input\_create\_nat\_gw) | Create a NAT gateway for internet access from private subnets | `bool` | `true` | no |
+| <a name="input_create_nat_gw"></a> [create\_nat\_gw](#input\_create\_nat\_gw) | Create a NAT gateway for internet access from private subnets. No gateway is created when private\_subnets is empty. | `bool` | `true` | no |
 | <a name="input_create_sg"></a> [create\_sg](#input\_create\_sg) | Shows whether а security group for VCP object should be created | `bool` | `true` | no |
 | <a name="input_create_vpc"></a> [create\_vpc](#input\_create\_vpc) | Shows whether a VCP object should be created. If false, an existing `vpc_id` is required. | `bool` | `true` | no |
 | <a name="input_domain_name"></a> [domain\_name](#input\_domain\_name) | Domain name to be added to DHCP options | `string` | `"internal."` | no |
@@ -139,7 +139,7 @@ No modules.
 | <a name="input_routes_private_subnets"></a> [routes\_private\_subnets](#input\_routes\_private\_subnets) | Describe your route preferences for public subnets | <pre>list(object({<br/>    destination_prefix = string<br/>    next_hop_address   = string<br/>  }))</pre> | `null` | no |
 | <a name="input_routes_public_subnets"></a> [routes\_public\_subnets](#input\_routes\_public\_subnets) | Describe your route preferences for public subnets | <pre>list(object({<br/>    destination_prefix = string<br/>    next_hop_address   = string<br/>  }))</pre> | `null` | no |
 | <a name="input_s3_private_endpoint"></a> [s3\_private\_endpoint](#input\_s3\_private\_endpoint) | Configuration for creating a private endpoint for Yandex Object Storage. When enabled, creates a secure connection to Object Storage without going through the public internet. Specify a subnet CIDR block and an IP address for the endpoint from one of the 'privite subnet's CIDR block'. At least one private subnet must be defined when s3\_private\_endpoint is enabled. | <pre>object({<br/>    enable                      = optional(bool, false)<br/>    private_dns_records_enabled = optional(bool, true)<br/>    subnet_v4_cidr_block        = optional(string, null)<br/>    address                     = optional(string, null)<br/>    }<br/>  )</pre> | `{}` | no |
-| <a name="input_vpc_id"></a> [vpc\_id](#input\_vpc\_id) | Existing `network_id` (`vpc-id`) where resources will be created | `string` | `null` | no |
+| <a name="input_vpc_id"></a> [vpc\_id](#input\_vpc\_id) | Existing `network_id` (`vpc-id`) where resources will be created. Required when `create_vpc` is false. | `string` | `null` | no |
 
 ## Outputs
 

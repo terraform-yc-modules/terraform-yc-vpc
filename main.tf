@@ -41,7 +41,7 @@ resource "yandex_vpc_subnet" "public" {
   v4_cidr_blocks = each.value.v4_cidr_blocks
   zone           = each.value.zone
   network_id     = local.vpc_id
-  folder_id      = lookup(each.value, "folder_id", local.folder_id)
+  folder_id      = each.value.folder_id != null ? each.value.folder_id : local.folder_id
   route_table_id = yandex_vpc_route_table.public[0].id
   dhcp_options {
     domain_name         = var.domain_name
@@ -59,7 +59,7 @@ resource "yandex_vpc_subnet" "private" {
   v4_cidr_blocks = each.value.v4_cidr_blocks
   zone           = each.value.zone
   network_id     = local.vpc_id
-  folder_id      = lookup(each.value, "folder_id", local.folder_id)
+  folder_id      = each.value.folder_id != null ? each.value.folder_id : local.folder_id
   route_table_id = yandex_vpc_route_table.private[0].id
   dhcp_options {
     domain_name         = var.domain_name
